@@ -1,0 +1,223 @@
+<html>
+    <head>
+        <style>
+            body{
+                background-color:black;
+                color:white;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="output"></div>
+    </body>
+    <script type="text/javascript">
+        let WaypointNavigator = class {
+            constructor(){
+                this.waypoints = [];
+                this.distances = [];
+                this.interval = 34;
+                this.tracksNeeded = 0;
+                this.trackStacks = 0;
+                this.poweredTracksNeeded = 0;
+                this.poweredTrackStacksNeeded = 0;
+                this.ironNeeded = 0;
+                this.ironStacksNeeded = 0;
+                this.goldNeeded = 0;
+                this.sticksNeeded = 0;
+                this.redstoneNeeded = 0;
+                this.headings = [0,0];
+                this.powerCoordinates = [];
+                this.railwayName = "";
+                this.statString = "<b><u>STATISTICS:</b></u><br>";
+            }
+            
+            nameRailway(s){
+                this.railwayName = s;
+            }
+            
+            addWaypoint(o){
+                if(o.length == 2){
+                    this.waypoints.push(o);
+                }
+            }
+            
+            getDistance(p1,p2){
+                return Math.abs(p2-p1);
+            }
+            
+            determineHeadings(p1,p2){
+                //x
+                if(p1[0] < p2[0]){
+                    this.headings[0] = 1;
+                }else if(p1[0] > p2[0]){
+                    this.headings[0] = -1;
+                }else if(p1[0] == p2[0]){
+                    this.headings[0] = 0;
+                }else{
+                    console.log("error in determineHeadings X");
+                    return false;
+                }
+                
+                //y
+                if(p1[1] < p2[1]){
+                    this.headings[1] = 1;
+                }else if(p1[1] > p2[1]){
+                    this.headings[1] = -1;
+                }else if(p1[1] == p2[1]){
+                    this.headings[1] = 0;
+                }else{
+                    console.log("error in determineHeadings Y");
+                    return false;
+                }
+                
+                //diagonal detect
+                if(this.headings[0] != 0 && this.headings[1] != 0){
+                    console.log("diagonal detected.");
+                    return false;
+                }
+            }
+            
+            getTracksNeeded(){
+                for(var i = 0; i < this.waypoints.length - 1; i++){
+                    var dist = 0;
+                    this.determineHeadings(this.waypoints[i],this.waypoints[i + 1]);
+                    
+                    if(this.headings[0] == 1 || this.headings[0] == -1){
+                        //x movement
+                        dist = this.getDistance(this.waypoints[i][0], this.waypoints[i + 1][0]);
+                    }else if(this.headings[1] == 1 || this.headings[1] == -1){
+                        dist = this.getDistance(this.waypoints[i][1], this.waypoints[i + 1][1]);
+                    }
+                    
+                    this.tracksNeeded += dist;
+                }
+                
+                this.trackStacks = Math.ceil(this.tracksNeeded / 64);
+                this.poweredTracksNeeded = Math.ceil(this.tracksNeeded / this.interval);
+                this.poweredTrackStacksNeeded = Math.ceil(this.poweredTracksNeeded / 64);
+                this.ironNeeded = Math.ceil(((this.tracksNeeded * 6) / 16) - this.poweredTracksNeeded);
+                this.ironStacksNeeded = Math.ceil(this.ironNeeded / 64);
+                this.goldNeeded = Math.ceil((this.poweredTracksNeeded * 6) / 6);
+                this.redstoneNeeded = this.poweredTracksNeeded * 2;
+                this.sticksNeeded = Math.ceil(this.tracksNeeded / 16);
+            }
+            
+            getPowerCoordinates(){
+                for(var i = 0; i < this.waypoints.length - 1; i++){
+                    var whichWay = "";
+                    
+                    this.determineHeadings(this.waypoints[i],this.waypoints[i+1]);
+                    
+                    if(this.headings[0] == 0){
+                        //it's y
+                        whichWay = "y";
+                    }else if(this.headings[1] == 0){
+                        //it's x
+                        whichWay = "x";
+                    }else{
+                        console.log("error in getPowerCoordinates: determining x or y");
+                        return false;
+                    }
+                    
+                    switch(whichWay){
+                        case "x":
+                            if(this.headings[0] == 1){
+                                for(var j = this.waypoints[i][0]; j < this.waypoints[i+1][0]; j+= this.interval){
+                                    var pc = [j, this.waypoints[i][1]];
+                                    this.powerCoordinates.push(pc);
+                                }
+                            }else if(this.headings[0] == -1){
+                                for(var j = this.waypoints[i][0]; j > this.waypoints[i+1][0]; j-= this.interval){
+                                    var pc = [j, this.waypoints[i][1]];
+                                    this.powerCoordinates.push(pc);
+                                }
+                            }
+                            break;
+                            
+                        case "y":
+                            if(this.headings[1] == 1){
+                                for(var j = this.waypoints[i][1]; j < this.waypoints[i+1][1]; j+= this.interval){
+                                    var pc = [this.waypoints[i][0], j];
+                                    this.powerCoordinates.push(pc);
+                                }
+                            }else if(this.headings[1] == -1){
+                                for(var j = this.waypoints[i][1]; j > this.waypoints[i+1][1]; j-= this.interval){
+                                    var pc = [this.waypoints[i][0], j];
+                                    this.powerCoordinates.push(pc);
+                                }
+                            }
+                            break;
+                            
+                        default:
+                            console.log("error in switch statement");
+                            break;
+                    }
+                }
+            }
+            
+            createStatString(){
+                this.statString += "RAILWAY NAME: " + this.railwayName + "<br>";
+                this.statString += "RAILWAY LENGTH: " + this.tracksNeeded + "<br><br>";
+                
+                this.statString += "<u><b>WAYPOINTS:</u></b><br>";
+                for(var i = 0; i < this.waypoints.length; i++){
+                    var m = (i + 1).toString() + ": ";
+                    m += "[" + this.waypoints[i][0].toString() + "," + this.waypoints[i][1].toString() + "]<br>";
+                    this.statString += m + "<br>";
+                }
+                
+                this.statString += "STICKS NEEDED: " + this.sticksNeeded + " (" + Math.ceil(this.sticksNeeded / 64) + " stacks)<br>";
+                this.statString += "IRON NEEDED: " + this.ironNeeded + " (" + this.ironStacksNeeded + " stacks)<br>";
+                this.statString += "GOLD NEEDED: " + this.goldNeeded + "<br>";
+                this.statString += "REDSTONE NEEDED: " + this.redstoneNeeded + " (" + Math.ceil(this.redstoneNeeded / 64) +" stacks)<br>";
+                this.statString += "TRACK STACKS NEEDED: " + this.trackStacks + "<br>";
+                this.statString += "POWERED TRACKS NEEDED: " + this.poweredTracksNeeded + "<br>";
+                this.statString += "POWERED TRACK STACKS NEEDED: " + this.poweredTrackStacksNeeded + "<br><br>";
+                
+                this.statString += "<b><u>POWERED TRACK COORDINATES:</b></u><br>";
+                for(var i = 0; i < this.powerCoordinates.length; i++){
+                    var m = (i+1).toString() + ": ";
+                    m += "[" + this.powerCoordinates[i][0].toString() + "," + this.powerCoordinates[i][1].toString() + "]<br>";
+                    this.statString += m + "<br>";
+                }
+            }
+            
+            outputStatString(d){
+                var o = document.getElementById(d);
+                o.innerHTML = this.statString;
+            }
+        }
+        
+        let A444 = new WaypointNavigator();
+        
+        var runtime = function(){
+            //add waypoints
+            /*
+            A444.addWaypoint([-1844,13282]);
+            A444.addWaypoint([-3330,13282]);
+            A444.addWaypoint([-3330,12888]);
+            A444.addWaypoint([-3707,12888]);
+            */
+            
+            A444.addWaypoint([-4883,13056]);
+            A444.addWaypoint([-4883,13874]);
+            A444.addWaypoint([-4849,13874]);
+            
+            /*
+            A444.addWaypoint([-3707,12892]);
+            A444.addWaypoint([-3707,13000]);
+            A444.addWaypoint([-4870,13000]);
+            */
+            //name railway
+            A444.nameRailway("Utica-Shoreline Connection");
+            //calculate
+            A444.getTracksNeeded();
+            A444.getPowerCoordinates();
+            A444.createStatString();
+            //output
+            A444.outputStatString("output");
+        }
+        
+        runtime();
+    </script>
+</html>
