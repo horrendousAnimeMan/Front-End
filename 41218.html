@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+	<head>
+		<style>
+			#textReceptacle{
+				color:white;
+				background-color:black;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="textReceptacle"></div>
+	</body>
+	<script type="text/javascript">
+			window.onload = function (){//"use strict";
+				var jeff = "";
+				
+				if (typeof jeff === "string") { //typeof returns a string of the data type.
+					console.log("we good?");
+					//jeff += " ";
+					var morbo = zalgo(jeff); //jeff zummons zalgo
+					var zorbo = analyze(morbo); //analyze
+					document.getElementById('textReceptacle').innerHTML += morbo;
+					document.getElementById('textReceptacle').innerHTML += zorbo;
+				} else {
+					console.log("nah");
+				}
+				
+				function analyze(inputString) {
+					console.log("beginning analysis.");
+					console.log("first character in inputString:" , inputString[0]);
+					console.log("length of string:" , inputString.length);
+					var occurrences = {}, //i see you
+						repetitions = {}, //ive seen you before
+						repetitionAmounts = {},
+						upLim = inputString.length,
+						i = 0,
+						j = 0,
+						x = 'end results undefined at this point.  contact your system administrator at home.';
+						
+					/*var testDude = {};
+					var testVar = inputString[0];
+					testDude[testVar] += 1;
+					console.log("testDude[testVar]:",testDude[testVar]); //plz?
+					*/
+					console.log("initializing values");
+					while (i < upLim) {
+						//initialize occurrences, repetitions, creating parallel arrays
+						occurrences[i] = inputString[i];
+						repetitions[i] = 0;
+						i += 1;
+						//why does this only work sometimes?
+					} //maybe this will work
+					console.log("initial value of occurrences[0]:" , occurrences[0]);
+					console.log("initial value of repetitions[0]:" , repetitions[0]);
+					i =0; //oh yeah, reset iterator after initialize.
+					
+					console.log("beginning computation. i, uplim:" , i ,upLim);
+					while (i < upLim) {
+						if (i % (upLim / 10) === 0){
+							console.log(".");
+						} //progress tracker
+						while (j < upLim) {
+							if (inputString[j]===inputString[i] && i !== j) { //ive seen you before
+								//repetitions[upLim[j]] += 1; //the count for This Character ++.
+								repetitions[i]+=1;
+								//console.log("repetition found:" , inputString[j], repetitions[i]);
+							}
+							j += 1;
+						}
+						j = 0;
+						i +=1;
+					}
+					console.log("computation complete. i,j=" , i , j);
+					
+					var BALGO = {
+						occ:occurrences,
+						rep:repetitions
+					}
+					
+					var SNELCH = "RESULTS WITH OR WITH MORE THAN THREE REPETITIONS: \n";
+					i = 0;
+					while (i < upLim) {
+						if (BALGO.rep[i] >= 3){
+							SNELCH += "||"
+							SNELCH += String(BALGO.occ[i]);
+							SNELCH += " : ";
+							SNELCH += String(BALGO.rep[i]);
+							if(i % 10 == 0){
+								SNELCH += "<br>";
+							}
+						}
+						i += 1;
+					}
+					
+					return SNELCH;
+				}
+				
+				function zalgo (inputString) {
+					console.log("zalgo has been summoned.");
+					var zalgosPower = 420 * 69,  //make larger for more complex data sets
+						i = 0,
+						hpLovecraft = new Uint16Array(zalgosPower);
+						window.crypto.getRandomValues(hpLovecraft);
+						console.log("variables set.");
+					while (i < zalgosPower) {
+						//inputString += String.fromCharCode(0x03A0 + Math.random() * (0x30FF-0x30A0+1)); //breaks page
+						//just wrote some code that broke firefox so bad i got the old school This Program is Not Responding box.
+						inputString += String.fromCharCode(hpLovecraft[i]);
+						i += 1; //ITERATOR!!!
+					}
+					//document.write(inputString);
+					console.log("hmnn>");
+					return inputString;
+				}
+			}
+			//now that the text file is there, we can do some data analytics on this beast.
+		</script>
+</html>
