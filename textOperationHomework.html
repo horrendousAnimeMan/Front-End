@@ -1,0 +1,155 @@
+<html>
+	<head>
+		<meta charset="utf-8">
+		<style>
+			body{
+				background-color:black;
+				color:white;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="testArea">
+			On the way to the store, a leopard nearly bit me.
+		</div>
+		<div id="outputArea"></div>
+	</body>
+	<script type="text/javascript">
+		/*
+		* TEST CASE: HIGHLIGHTED TEXT TO TAG
+		* Highlight text in document.getElementById("testArea");
+		* Then display as h3 with id "newText" in document.getElementById("outputArea");
+		*/
+		let TextOperations = class{
+			constructor(){
+				//
+				this.selectedText = null;
+				this.entireText = null;
+				this.selectionIndices = [null,null];
+			}
+			
+			getSelectionText(){
+				var text = "";
+				
+				
+				if(window.getSelection){
+					console.log("window.getSelection()");
+					text = window.getSelection.toString();
+				}else if(document.selection && document.selection.type != "Control"){
+					console.log("document.selection && document.selection.type");
+					text = document.selection.createRange().text;
+				}
+				
+				//return text;
+				this.selectedText = text;
+				
+				this.entireText = document.activeElement.innerHTML;
+			}
+			
+			getSelectionTextAlternate(){
+				/*
+				if(window.getSelection){
+					var range = window.getSelection();
+					console.log(range.toString());
+					//console.log(range);
+					this.selectedText = range.toString();
+					if(this.selectedText != null){
+						this.entireText = this.translateFromAnchorToPlainText(range.anchorNode.parentElement.innerHTML.toString());
+					}
+					//console.log(this.entireText);
+				}else{
+					if(document.selection.createRange){
+						var range = document.selection.createRange();
+						//console.log(range.text);
+					}
+				}
+				*/
+				
+				if(window.getSelection){
+					try{
+						var range = window.getSelection();
+						
+						console.log(range.toString());
+						
+						this.selectedText = range.toString();
+						
+						//console.log(range);					
+						this.entireText = this.translateFromAnchorToPlainText(range.anchorNode.parentElement.innerHTML.toString());
+						
+						this.selectionIndices = [
+							this.entireText.search(this.selectedText),
+							((this.entireText.search(this.selectedText) + this.selectedText.length)-1)
+						];
+					}catch(e){
+						if(range.anchorNode == null){
+							//
+						}else{
+							console.log("error at getSelectionTextAlternate");
+							console.log(e);
+						}
+						
+					}
+				}
+			}
+			
+			createFormattedString(destinationDivId){
+				
+			}
+			
+			translateFromAnchorToPlainText(textIn){
+				/*
+				var newText = textIn;
+				var newNewText = "";
+				
+				for(var i = 0; i < textIn.length; i++){
+					if(textIn.charAt(i) == '\\'){
+						newText.charAt(i) = null;
+						newText.charAt(i+1) = null;
+					}
+				}
+				
+				for(var i = 0; i < newText.length; i++){
+					if(newText.charAt(i) != null){
+						newNewText += newText.charAt(i);
+					}
+				}
+				
+				return newNewText;
+				*/
+				/*
+				var newText = textIn;
+				var newNewText = "";
+				
+				for(var i = 0; i < textIn.length; i++){
+					if(textIn.charAt(i) ==  " "){
+						console.log("backslash found.");
+						newText.replaceAt(i,"ȣ");
+						newText.replaceAt((i+1),"ȣ");
+					}
+				}
+				
+				for(var i = 0; i < newText.length; i++){
+					if(newText.charAt(i) != "ȣ"){
+						newNewText += newText.charAt(i);
+					}
+				}
+				*/
+				var newNewText = textIn.trim();
+				
+				return newNewText;
+			}
+		}
+		
+		String.prototype.replaceAt = function(index, replacement){
+			return this.substr(0,index) + replacement + this.substr(index + replacement.length);
+		}
+		
+		let m = new TextOperations();
+		
+		
+		document.onmouseup = document.onkeyup = document.onselectionchange = function(){
+			m.getSelectionTextAlternate();
+		};
+		
+	</script>
+</html>
