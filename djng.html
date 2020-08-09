@@ -1,0 +1,102 @@
+﻿<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<style>
+			body{
+				background-color:black;
+				color: '#00FF00';
+				font-family:'Terminal';
+				font-size:16pt;
+			}
+
+			#outputArea{
+				color:#00FF00;
+			}
+
+			#title{
+				font-size:18pt;
+				vertical-align: middle;
+				text-align:center;
+			}
+
+			button {
+				font-family:'Terminal';
+				font-size:18pt;
+				width:500px;
+				background-color: #00FF00;
+				border-style: outset;
+				border-width: 5px;
+				border-color: #00FC00;
+				color: black;
+			}
+
+			button:active {
+				background-color:#00CC00;
+			}
+
+			hr{
+				color:#00FF00;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="title" style="font-size:16pt">
+			<button onclick="moe.createManyNames()">Generate DJ Name</button>
+			<br/><br/><hr>
+		</div>
+		<div id="outputArea"></div>
+	</body>
+	<script type="text/javascript">
+		let djNameGenerator = class{
+			constructor(howMany, charCount){
+				this.howMany = howMany;
+				this.charCount = charCount;
+				this.outStrs = []; //collection of words
+				this.acceptableChars = "AAABCDEEEFGHIIIJKLMNOOOPQRSTUUUVWXYZ1234567890!@#$^";
+				//added extra iterations of vowels for higher probability				
+				//abcdefghijklmnopqrstuvwxyz
+			}
+
+			createWord(){
+				var o = "";
+				for(var i = 0; i < this.charCount; i++){
+					var m = Math.floor(Math.random() * this.acceptableChars.length);
+					var s = this.acceptableChars.charAt(m);
+					var rng = Math.floor(Math.random() * 9);
+					if(rng == 1 || rng == 9){
+						s += " ";
+						i += 1;
+					}
+					o += s;
+				}
+				this.outStrs.push(o);
+			}
+
+			outputValues(){
+				var oA = document.getElementById("outputArea");
+				var S = "";
+				for(var i = 1; i < this.outStrs.length; i++){
+					S += this.outStrs[i];
+					S += "&nbsp;&nbsp;&nbsp;&nbsp;";
+					if(i % 6 == 0 && i != 0){
+						S += "<br>";
+					}
+				}
+				oA.innerHTML = S;
+			}
+
+			createManyNames(){
+				this.outStrs = []; //there it is lol
+				for(var i = 0; i < this.howMany; i++){
+					this.createWord(this.charCount);
+				}
+				//console.log("createManyNames complete.");
+				this.outputValues();
+			}
+		}
+
+		var moe = new djNameGenerator((40*6),8);
+		moe.createManyNames();
+	</script>
+</html>
