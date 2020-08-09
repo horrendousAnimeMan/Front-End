@@ -1,0 +1,154 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<style>
+			#outputArea {
+				background-color:black;
+				color:white;
+				font-family:'Arial';
+			}
+			body {
+				background-color:black;
+				color:white;
+				font-family:'Arial';
+			}
+		</style>
+	</head>
+	<body>
+		<div id="outputArea"></div>
+		<script type="text/javascript">
+			var n = document.getElementById("outputArea");
+			n.innerHTML += "|";
+			//RGBAboy: Contains values[r,g,b,a]
+			var rgbaBoy = function () {
+				this.values = [0,0,0,0];
+				this.setValues = function (a) {
+					this.values = a;
+				}
+				this.randomizeValues = function () {
+					var newArray = [];
+					for (var i = 0; i < this.values.length; i++) {
+						if (i != 3) {
+							var newVal = Math.floor(Math.random() * 256);
+							newArray.push(newVal);
+						} else if (i == 3) {
+							var newVal = Math.floor(Math.random() * 11)/10;
+							newArray.push(newVal);
+						}
+					}
+					this.setValues(newArray);
+				}
+			}
+			//GradientBoy: Contains RGBAboys[obj,obj,obj]
+			var gradientBoy = function () {
+				this.values = [];
+				this.addValue = function (a) {
+					this.values.push(a);
+				}
+				this.setValues = function (a) {
+					this.values = a;
+				}
+			}
+			//OutputBoy: Makes colored divs
+			var outputBoy = function (gradBoy, outputArea) {
+				this.divIdStrings = [];
+				this.rgbaStrings = [];
+				this.createDivs = function () {
+					//create divs for each rgba val in gradBoy.  Individually addressable.
+					for (var i = 0; i < gradBoy.values.length; i++) {
+						var div = document.createElement("div");
+						var idString = "";
+						idString += "rgbaDiv";
+						idString += i;
+						div.id = idString;
+						this.divIdStrings.push(idString);
+						document.getElementById(outputArea).appendChild(div);
+						div.innerHTML += "||";
+						div.innerHTML += i;
+					}
+				}
+				this.styleDivs = function () {
+					//style them with background color from gradBoy.rgba[i]
+					for (var i = 0; i < gradBoy.values.length; i++) {
+						var newString = "rgba(";
+						for (var j = 0; j < gradBoy.values[i].values.length; j++) {
+							if (j != 3) {
+								newString += gradBoy.values[i].values[j];
+								newString += ",";
+							} else if (j == 3) {
+								newString += gradBoy.values[i].values[j];
+								newString += ")";
+							}
+						}
+						this.rgbaStrings.push(newString);
+						document.getElementById(this.divIdStrings[i]).style.backgroundColor = newString;
+					}
+				}
+			}
+			//demonstration boy
+			var demoBoy = function () {
+				this.keyFrames = []; //its got rgba boys in it
+				this.initialize = function () {
+					var r1 = new rgbaBoy();
+					var r2 = new rgbaBoy();
+					r1.randomizeValues();
+					r2.randomizeValues();
+					this.keyFrames.push(r1);
+					this.keyFrames.push(r2);
+				}
+			}
+			//interpolatey boy!  the fun one!  gives back a gradient boy.
+			var interpo = function (start, end, resolution) {
+				this.grady = new gradientBoy();
+				this.increments = [];
+				this.rgbaValues = [];
+				this.rgbaValues.push(start);
+				this.roundInc = function (val) {
+					//
+					//gives a 2 decimal value.
+					return Math.round((val * 100))/100;
+				}
+				//find increments.
+				for (var i = 0; i < start.values.length; i++) {
+					var incVal = this.roundInc((end.values[i] - start.values[i])/resolution);
+					this.increments.push(incVal);
+				}
+				//interpolate.
+				for (var i = 0; i < resolution; i++) {
+					var newRgbaBoy = new rgbaBoy();
+					for (var j = 0; j < start.values.length; j++) {
+						if (j != 3) {
+							var newVal = Math.round(start.values[j] + (this.increments[j] * i));
+							if (newVal > 255) {
+								newVal = 255;
+							}
+							if (newVal < 0) {
+								newVal = 0;
+							}
+							newRgbaBoy.values[j] = newVal;
+						} else {
+
+							var newVal = this.roundInc(start.values[j] + (this.increments[j] * i));
+							newRgbaBoy.values[j] = newVal;
+						}
+					}
+					if (i != 0) {
+						//avoids repetition at start
+						this.rgbaValues.push(newRgbaBoy);
+					}
+				}
+				//create the gradient, officially
+				this.grady.setValues(this.rgbaValues);
+				return grady;
+			}
+			var d = new demoBoy();
+			d.initialize();
+			var g = interpo(d.keyFrames[0],d.keyFrames[1],64);
+			var o = new outputBoy(g, "outputArea");
+			o.createDivs();
+			o.styleDivs();
+			
+		</script>
+	</body>
+</html>
