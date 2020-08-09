@@ -1,0 +1,881 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<link rel="stylesheet" href="https://use.typekit.net/tai2htj.css">
+		<script>
+			window.onload = function () {
+				try {
+				Typekit.load();
+					} catch(e) {
+				}
+			};
+		</script>
+		<title>Splatahouse</title>
+		<meta charset="utf-8">
+		<style>
+			a:link{
+				text-decoration:none;
+				color:rgb(255,255,255);
+			}
+			a:hover{
+				color:rgb(0,0,0);
+			}
+			h2{
+				font-family:'Komu A';
+				font-size:36pt;
+			}
+			#splataText:hover{
+				color:white;
+			}
+			#splataText:active{
+				color:rgb(198,198,198);
+			}
+			.imgClass{
+				width:98%;
+			}
+			#splatahouseTitle{
+				background-color:rgba(255,255,255,0.50);
+				margin-top:0;
+				margin-bottom:0;
+			}
+			#splatahouseTitle:hover{
+				cursor:grabbing;
+			}
+			#outputArea {
+				background-color:black;
+				color:rgb(255,255,255,0.25);
+				font-family:'Arial';
+			}
+			body {
+				background-color:black;
+				color:white;
+				font-size:14pt;
+			}
+			.procDiv{
+				display:inline;
+				font-family:'Tahoma';
+				font-size:14pt;
+			}
+			#splatahouse{
+				font-family:'Paralucent Text';
+				font-size:12pt;
+				display:block;
+				width:98%;
+				//height:95%;
+				position:absolute;
+				left:0px;
+				top:0px;
+				margin-left:10px;
+				margin-right:10px;
+				margin-top:10px;
+				background-color:rgb(255,255,255,0.5);
+				color:black;
+			}
+			#leftNavArea{
+				font-size:16pt;
+				width:20%;
+				vertical-align:top;
+				
+			}
+			.emphasis{
+				transition: height 0.5s;
+				-webkit-transition: height 0.5s;
+				overflow:hidden;
+			}
+			.emphasis:hover{
+				height:50%;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="splatahouse">
+			<h2 id ="splatahouseTitle" onclick="bmt.updatePallette()"><a id="splataText">SPLATA HOUSE DOT COM</a></h2>
+			<table style="width:100%" name="theGradient">
+				<tr id="theGradientRow">
+					<!--dynamic content goes here as td's.-->
+				</tr>
+			</table>
+			<table style="width:100%">
+				<tr>
+					<td id="leftNavArea">
+						
+					</td>
+					<td id="mainArea">
+					
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div id="outputArea">
+			<!--dynamically generated divs go here-->
+		</div>
+		<!--shimmeryBoy-->
+		<script type="text/javascript">
+			var n = document.getElementById("outputArea");
+			n.innerHTML += "|";
+			/*
+				born to script
+				type safety is a fuck
+				eval em all 2018
+				i am js man
+				410, 757,864,530 ignored warnings
+			*/
+			
+			//SITE
+			/*
+				IDEAL:
+				Dynamically generated.
+				JSON's for each Post.
+				Post Tool can make and edit posts.
+				Newest post first, 4 at a time before Load More.
+				
+				JSON OBJECT: POST
+					filePath:"", //the song or art.
+					fileType:"", //sound or image
+					artPath:"", //the art
+					description:"", //html format text
+					postID:"", //answers the question what gets shown first, or which to edit.
+					
+				WHAT I CAN DO RIGHT NOW:
+					not quite that, but framework to do so later.
+			*/
+			/*
+				I upload the file along with its descriptor and title.
+				at time of upload, a json file is made that points to the required locations.
+				at time of page load, read json files and parse to post().
+			*/
+			
+			//CLASS DECLARATIONS
+			
+			let charDiv = class {
+				constructor(minUnicode,maxUnicode,outputDiv){
+					this.ch = "";
+					this.charCount = 1; //defaults to 1, can be changed.
+					this.minUnicode = minUnicode; //&#minUnicode;
+					this.maxUnicode = maxUnicode; //&#maxUnicode;
+					this.outputDiv = outputDiv; //"containerDivName"
+					//this.procGenTag = procGenTag; //"childDivPrefix"
+				}
+				updateCharRandom(){
+					//
+					var c = ["&#",null,";"];
+					var c2 = "";
+					var n = Math.floor(Math.random() * this.maxUnicode) + this.minUnicode;
+					c[1] = n;
+					for(var i = 0; i < c.length; i++){
+						c2 += c[i];
+					}
+					this.ch = c2;
+				}
+				updateChar(charIn){
+					//
+					var c = ["&#",null,";"];
+					var c2 = "";
+					if(charIn.length == 1){
+						c[1] = charIn;
+					} else {
+						console.log("charIn error:",charIn);
+					}
+					for(var i = 0; i < c.length; i++){
+						c2 += c[i];
+					}
+				}
+				updateDiv(){
+					//
+					var c = document.getElementById(this.outputDiv);
+					c.innerHTML = this.ch;
+				}
+			};
+
+			let charDivArray = class {
+				constructor(minUnicode,maxUnicode,outputDiv,procDiv,arraySize){
+					//this.ch = "";
+					//console.log("creating charDivArray.");
+					this.charCount = 1; //defaults to 1, can be changed.
+					this.minUnicode = minUnicode; //&#minUnicode;
+					this.maxUnicode = maxUnicode; //&#maxUnicode;
+					this.outputDiv = outputDiv; //"containerDivName"
+					this.procDiv = procDiv; //"childDivPrefix"
+					this.arraySize = arraySize; //893
+					this.charray = []; //array of charDivs
+					this.shimmerOn = false; //shimmer on?
+					//console.log("charDivArray created.");
+					this.makeNewCharDivs();
+				}
+				//make new charDivs
+				makeNewCharDivs(){
+					//console.log("making new charDivs.");
+					for(var i = 0; i < this.arraySize; i++){
+						var m = new charDiv(this.minUnicode, this.maxUnicode, this.procDiv);
+						m.updateCharRandom();
+						this.charray.push(m);
+					}
+					//console.log("charDivs created.");
+					this.setCharDivOutputsSerialized();
+				}
+				//set charDiv outputs to serialized div tags
+				setCharDivOutputsSerialized(){
+					//console.log("setting id tags.");
+					for(var i = 0; i < this.charray.length; i++){
+						var n = "";
+						n += this.procDiv;
+						n += String(i);
+						this.charray[i].outputDiv = n;
+					}
+					//console.log("id tags set.");
+					this.addDivsToDocument();
+				}
+				//add divs to document
+				addDivsToDocument(){
+					//console.log("adding divs to document. OUTPUTDIV:",this.outputDiv, "PROCDIV:",this.procDiv);
+					for(var i = 0; i < this.charray.length; i++){
+						var div = document.createElement("div");
+						div.id = this.charray[i].outputDiv;
+						div.className = "procDiv";
+						div.style.display = "inline-block";
+						document.getElementById(this.outputDiv).appendChild(div);
+					}
+					this.outputToDivs();
+				}
+				//output to divs
+				outputToDivs(){
+					for(var i = 0; i < this.charray.length; i++){
+						var m = document.getElementById(this.charray[i].outputDiv);
+						m.innerHTML = this.charray[i].ch;
+						if(i % 32 == 0){
+							m.innerHTML += "<br>";
+						}
+					}
+				}
+				//update div singular
+				updateDivAt(divNumIn){
+					var s = "" + String(this.procDiv) + String(divNumIn);
+					document.getElementById(s).innerHTML = this.charray[divNumIn].ch;
+				}
+				//hmm
+				updateCharAt(indexIn){
+					//
+					/*
+					var c = ["&#",null,";"];
+					var c2 = "";
+					if(charIn.length == 1){
+						c[1] = charIn;
+					} else {
+						console.log("charIn error:",charIn);
+					}
+					for(var i = 0; i < c.length; i++){
+						c2 += c[i];
+					}
+					*/
+					this.charray[indexIn].updateCharRandom();
+					this.updateDivAt(indexIn);
+				}
+				//update divs' charset
+				updateDivs(){
+					for(var i = 0; i < this.charray.length; i++){
+						this.charray[i].updateCharRandom();
+					}
+					for(var i = 0; i < this.charray.length; i++){
+						var s = "" + String(this.procDiv) + String(i);
+						document.getElementById(s).innerHTML = this.charray[i].ch;
+					}
+				}
+				//update A div's charset
+				/* updateDiv(serialNumber){
+					if(serialNumber < this.charray.length){
+						this.charray[serialNumber].updateCharRandom();
+					} else if (serialNumber < 0 || serialNumber > this.charray.length){
+						console.log("charray index out of bounds.");
+					}
+				} */
+				//on command, SHIMMER AND SHINE!
+			}
+			
+			let shimmerBoy = class {
+				constructor(cdaIn){
+					this.cda = cdaIn;
+					this.iteratorMax = cdaIn.charray.length;
+					this.iterator = 0;
+					this.active = true;
+				}
+				shimmer(){
+					try{
+						if(this.active == true){
+							this.cda.updateCharAt(this.iterator);
+							this.iterator += 1;
+						}
+						
+						if(this.iterator > this.cda.charray.length - 1){
+							//console.log("upperLimit");
+							this.iterator = 0;
+						}
+					}catch(er){
+						console.log(er + this.iterator);
+					}
+				}
+				activate(){
+					let z = setInterval(() => this.shimmer(), 144);
+				}
+				//random rgb val!they good!~
+				randomRGBString(){
+					var newArray = [0,0,0];
+					for (var i = 0; i < newArray.length; i++) {
+						var newVal = Math.floor(Math.random() * 256);
+						newArray.push(newVal);
+					}
+					var s = "rgb(";
+					for(var i = 0; i < newArray.length; i++){
+						s += String(newArray[i]);
+						if(i != newArray.length - 1){
+							s += ",";
+						}
+					}
+					s += ");";
+				}
+				
+				updateStyleRandomColor(){
+					
+				}
+			} 
+			
+			let shimmerGroup = class {
+				constructor(size, outputArea, procDivID,cdaMinSize,cdaMaxSize){
+					//make some random cda's and make the boys
+					this.size = size; //number of shimmerBoys
+					this.cdaMinSize = cdaMinSize; //min charDivArray Size
+					this.cdaMaxSize = cdaMaxSize; //max charDivArray Size
+					this.outputArea = outputArea; //where to shmoove them
+					this.procDiv = procDivID; //what the tiny shmoobs will be named
+					this.rgbValues = ['rgb(255,255,255);']; //rgb values for styling.
+					//
+					//first, charDivArrays.
+					for(var i = 0; i < this.size; i++){
+						//create the charDivArray constructor values.
+						
+						//minUnicode
+						var n = Math.floor(Math.random() * this.cdaMaxSize) + this.cdaMinSize;
+						//maxUnicode
+						var o = Math.floor(Math.random() * this.cdaMaxSize) + this.cdaMinSize;
+						//outputArea
+						//procDiv
+						this.procDiv += String(i);
+						//size
+						this.procDiv = this.outputArea + String(i);
+					}
+						//next, shimmerBoys.
+						//activate them shimmerBoys.
+					//
+				}
+				
+				//style em
+				styleEm(){
+					//
+				}
+			}
+			
+			let post = class {
+				constructor(postID, postTitle, type, postDescription, imageURL, audioURL){
+					this.postID = postID;
+					this.postTitle = postTitle;
+					this.type = type; //used for dynamic styling
+					this.postDescription = postDescription;
+					this.imageURL = imageURL;
+					this.audioURL = audioURL;
+				}
+				placePost(targetDiv,style){
+					/*
+						<div id=post1>
+							<div id="postTitle"></div>
+							<div id="postImage"></div>
+							<div id="postAudio"></div>
+						</div>
+					*/
+					//container div
+					var postDiv = document.createElement("div");
+					
+					//content divs
+					var title = document.createElement("h1");
+					
+					var image = document.createElement("img");
+					var imageContainer = document.createElement("div");
+					
+					var audioContainer = document.createElement("div");
+					var audio = document.createElement("AUDIO");
+					
+					var descr = document.createElement("div");
+					
+					//set content div attributes
+					//div id's 
+					postDiv.setAttribute("class","postArea");
+					
+					title.setAttribute("class","title");
+					
+					imageContainer.setAttribute("class","image");
+					
+					audioContainer.setAttribute("class","audio");
+					
+					descr.setAttribute("class","textArea");
+					
+					//set media url's
+					audioContainer.setAttribute("audioURL",this.audioURL);
+					audio.src = this.audioURL;
+					audio.controls = true;
+					image.setAttribute("src",this.imageURL); //hope this works
+					image.setAttribute("class","imgClass");
+					
+					//descr
+					descr.innerHTML = this.postDescription;
+					title.innerHTML = this.postTitle;
+					
+					//style
+					postDiv.style.marginBottom = "4%";
+					postDiv.style.marginLeft = "2%";
+					postDiv.style.marginRight = "10px";
+					//postDiv.style.opacity = "0.5";
+					//audioContainer.style.width = "100%";
+					audio.style.width = "98%";
+					
+					//create heirarchy
+					postDiv.appendChild(title);
+					imageContainer.appendChild(image);
+					postDiv.appendChild(imageContainer);
+					postDiv.appendChild(audio);
+					postDiv.appendChild(descr);
+					
+					//oh for fucks sake fine, going back to spacer.png lol
+					/*
+					var zpacer = document.createElement("div");
+					zpacer.style.width = "100%";
+					zpacer.style.backgroundColor = "rgba(0,0,0,0);";
+					postDiv.style.height = "10%";
+					postDiv.appendChild(zpacer);
+					*/
+					//place in target div
+					document.getElementById(String(targetDiv)).appendChild(postDiv);
+				}
+			};
+			
+			let siteBuilder = class{
+				constructor(pallette){
+					this.palletteSource = pallette;
+					
+					var psrl = this.palletteSource.rgbaStrings.length;
+					
+					this.descriptives = {
+						/*
+							background is 1st color.  text color is last color.
+							link color is mid color.
+							hover link color is mid color plus ((length/2)/2)
+						*/
+						background_color:this.palletteSource.rgbaStrings[0],
+						text_color:this.palletteSource.rgbaStrings[psrl-1],
+						link_color:this.palletteSource.rgbaStrings[Math.round(psrl / 2)],
+						link_hover_color:this.palletteSource.rgbaStrings[Math.round((psrl / 2) + ((psrl / 2) / 2))],
+						left_nav_background_color:this.palletteSource.rgbaStrings[Math.round(psrl / 3)],
+						other_color:this.palletteSource.rgbaStrings[1]
+					};
+				}
+				
+				makeIntroSplashLine(){
+					for(var i = 0; i < this.palletteSource.rgbaStrings.length; i++){
+						var d = document.createElement("td");
+						d.id = String("gradientSegment" + String(i));
+						d.style.backgroundColor = this.palletteSource.rgbaStrings[i];
+						d.style.height = "1em";
+						document.getElementById("theGradientRow").appendChild(d);
+					}
+				}
+				
+				updateIntroSplashLine(){
+					for(var i = 0; i < this.palletteSource.rgbaStrings.length; i++){
+						try{
+							var d = document.getElementById(String("gradientSegment" + String(i)));
+							d.style.backgroundColor = this.palletteSource.rgbaStrings[i];
+						}catch(e){
+							//fine whatever it works
+							console.log(i);
+						}
+						
+					}
+				}
+				
+				updatePallette(){
+					//get values from new thing, then set areas.
+					var palletteSource = new theRealFiboGrad(new rgbaBoy(), new rgbaBoy(), this.palletteSource.rgbaStrings.length-1, 12, "main", "none");
+					//get
+					var psrl = palletteSource.rgbaStrings.length;
+					this.descriptives["background_color"] = palletteSource.rgbaStrings[0];
+					this.descriptives["text_color"] = palletteSource.rgbaStrings[psrl-1];
+					this.descriptives["link_color"] = palletteSource.rgbaStrings[Math.round(psrl / 2)];
+					this.descriptives["link_hover_color"] = palletteSource.rgbaStrings[Math.round((psrl / 2) + ((psrl / 2) / 2))];
+					this.descriptives["left_nav_background_color"] = palletteSource.rgbaStrings[Math.round(psrl / 3)];
+					this.descriptives["other_color"] = palletteSource.rgbaStrings[1];
+					//set
+					let ln = document.getElementById("leftNavArea");
+					let ma = document.getElementById("mainArea");
+					let cd = document.getElementById("continuousMix");
+					
+					ln.style.backgroundColor = this.descriptives["left_nav_background_color"];
+					ma.style.backgroundColor = this.descriptives["background_color"];
+					continuousMix.style.backgroundColor = this.descriptives["other_color"];
+					ln.style.color = this.descriptives["other_color"];
+					ma.style.color = this.descriptives["text_color"];
+					
+					this.palletteSource = palletteSource;
+					
+					this.updateIntroSplashLine();
+				}
+				
+				makeMainArea(){
+					this.makeIntroSplashLine();
+				
+					let ln = document.getElementById("leftNavArea");
+					let ma = document.getElementById("mainArea");
+					ln.innerHTML += "23938457293847";
+					ma.innerHTML += "843245678544039";
+					
+					//okay now that we know that works, check this out
+					ln.style.backgroundColor = this.descriptives["left_nav_background_color"];
+					ma.style.backgroundColor = this.descriptives["background_color"];
+					ln.style.color = this.descriptives["other_color"];
+					ma.style.color = this.descriptives["text_color"];
+					
+					//okay cool, now to make the left nav divs.
+					var continuousMix = document.createElement("div");
+					continuousMix.setAttribute("id","continuousMix");
+					continuousMix.style.backgroundColor = this.descriptives["other_color"];
+					continuousMix.innerHTML = "<a href='#'>CONTINUOUS MIX</a>";
+					ln.appendChild(continuousMix);
+					
+					//now add something fun to the title.
+					//let td = document.getElementById("splatahouseTitle");
+					//td.setAttribute("class","emphasis");
+				}
+			};
+			
+			let rgbaBoy = class {
+				constructor(){
+					this.values = [];
+					
+					this.randomVals();
+				}
+				setVals(a){
+					this.values = a;
+				}
+				randomVals(){
+					var o = [];
+					var newVal = 0;
+					
+					for (var i = 0; i < 3; i++) {
+						newVal = Math.floor(Math.random() * 256);
+						o.push(newVal);
+					}
+					
+					this.values = o;
+				}
+			};
+			
+			let theRealFiboGrad = class {
+				constructor(start, end, fiboSize, divSize, name, outputDiv){
+					this.start = start;
+					this.end = end;
+					this.name = name;
+					this.fiboSize = fiboSize;
+					this.divSize = divSize;
+					this.outputDiv = outputDiv
+					
+					this.deltas = [];
+					this.fiboSeq = [];
+					this.ratioSeq = [];
+					this.interpSeq = []; //many rgbaBoys
+					this.rgbaStrings = []; //
+					
+					this.createFiboSeq();
+				}
+				
+				updateRGBVals(start, end){
+					this.start = start;
+					this.end = end;
+					
+					this.getDeltas();
+				}
+				
+				createFiboSeq(){
+					var o = [];
+					var newVal = 0;
+					o.push(1);
+					
+					//console.log("createFiboSeq");
+					for (var i = 0; i < this.fiboSize; i++) {
+						//
+						if (i == 0) {
+							var newVal = ((o[i])+(o[i]));
+							o.push(newVal);
+						} else if (i != 0) {
+							var newVal = ((o[i])+(o[i-1]));
+							o.push(newVal);
+						}
+					}
+					//console.log(o);
+					
+					this.fiboSeq = o;
+					
+					this.createRatioSeq();
+				}
+				
+				createRatioSeq(){
+					var o = [];
+					var newVal = 0;
+					
+					for(var i = 0; i < this.fiboSeq.length; i++){
+						newVal = Math.round((1 / this.fiboSeq[i]) *100)/100;
+						o.push(newVal);
+					}
+					
+					this.ratioSeq = o;
+					
+					this.getDeltas();
+				}
+					
+				getDeltas(){
+					var o = [];
+					var newVal = 0;
+						
+					for(var i = 0; i < this.start.values.length; i++){
+						newVal = this.end.values[i] - this.start.values[i];
+						o.push(newVal);
+					}
+					
+					this.deltas = o;
+					
+					this.interpolateRGBA();
+				}
+
+				interpolateRGBA(){
+					var o = []; //rgbaBoys
+					var p = []; //rgbaBoyData
+					var newVal = 0; //numeric data
+					
+					//console.log("beginning interpolation.");
+					
+					//o.push(this.end);
+					
+					for(var i = 0; i < this.ratioSeq.length; i++){
+						var rG = new rgbaBoy();
+						
+						p = [];
+						
+						//console.log("i"+i);
+						
+						for(var j = 0; j < this.start.values.length; j++){
+							if(j != 3){
+								newVal = this.start.values[j] + (Math.round(this.ratioSeq[i] * this.deltas[j]));
+								
+								p.push(newVal);
+								
+								//console.log(newVal);
+							}
+							else if (j == 3) {
+								newVal = Math.round((this.ratioSeq[i] * this.deltas[j])*100)/100;
+								p.push(newVal);
+								
+								//console.log(newVal);
+							}
+							
+							//console.log("j"+j);
+							
+						}//for r,g,b,a
+						rG.setVals(p);
+						//console.log(rG);
+						o.push(rG);
+					}//for each ratio,
+					//o.push(this.end);
+					this.interpSeq = o;
+					
+					this.setRGBAStrings();
+				}
+				setRGBAStrings(){
+					var s = "";
+					
+					//create rgba strings.
+					for(var i = 0; i < this.interpSeq.length; i++){
+						if(this.interpSeq[0].values.length == 4){
+							s += "rgba(";
+						}else if(this.interpSeq[0].values.length == 3){
+							s += "rgb(";
+						}
+						
+						for(var j = 0; j < this.interpSeq[i].values.length; j++){
+							s += this.interpSeq[i].values[j];
+							if(this.interpSeq[0].values.length == 4 && j != 3){
+								s += ",";
+							}
+							if(this.interpSeq[0].values.length == 3 && j != 2){
+								s += ",";
+							}
+						}
+						
+						s += ")";
+						this.rgbaStrings.push(s);
+						s = "";
+					}
+					
+					//this.createDivs("styledDiv");
+				}
+				
+				createDivsV2(containerIDTag,divIDTag,repetitions){
+					//initialize containers
+					for(var i = 0; i < repetitions; i++){
+						var div = document.createElement("div");
+						var idString = String(containerIDTag) + String(i);
+						div.id = idString;
+						document.getElementById(this.outputDiv).appendChild(div);
+						idString = "";
+					}
+					//initialize divs
+					for(var i = 0; i < this.interpSeq.length; i++){
+						var div = document.createElement("div");
+						var idString = String(divIDTag) + String(i);
+						var targetIdString = String(containerIDTag) + String(i);
+						div.id = idString;
+						document.getElementById(String(targetIdString)).appendChild(div);
+						idString = "";
+						targetIdString = "";
+					}
+					//make the new realFiboGrads
+					for(var i = 0; i < this.rgbaStrings.length; i++){
+						var s = "";
+						var m = new realFiboGrads(new rgbaBoy, 
+						new rgbaBoy, 
+						this.interpSeq.length, 
+						this.divSize, 
+						"and who could forget dear rat boy",
+						containerIDTag);
+						s += divIDTag;
+						s += i;
+						//console.log(s);
+						
+					}
+				}
+				
+				createDivs(divIDTag){
+					var idString = "";
+					
+					//initialize and id divs
+					for(var i = 0; i < this.interpSeq.length; i++){
+						var div = document.createElement("div");
+						idString += divIDTag;
+						idString += i;
+						div.id = idString;
+						document.getElementById(this.outputDiv).appendChild(div);
+						idString = "";
+					}
+					
+					//style divs
+					//document.getElementById(this.outputArea).style.height = "100%";
+					//document.getElementById(this.outputArea).style.width = "100%";
+					
+					for(var i = 0; i < this.rgbaStrings.length; i++){
+						var s = "";
+						s += divIDTag;
+						s += i;
+						//console.log(s);
+						document.getElementById(s).style.height = String(Math.round((this.divSize * this.ratioSeq[i]))) + "px";
+						document.getElementById(s).style.width = String(Math.round((this.divSize * this.ratioSeq[i]))) + "px";
+						document.getElementById(s).style.backgroundColor = this.rgbaStrings[i];
+						document.getElementById(s).style.left = String(Math.round(this.divSize * this.ratioSeq[i])) + "px";
+						document.getElementById(s).style.position = "absolute";
+						document.getElementById(s).style.display = "block";
+						//document.getElementById(s).innerHTML += this.rgbaStrings[i];
+						//document.getElementById(s).style.width = "50%";
+					}
+					//console.log(this.outputDiv);
+					for(var i = 0; i < this.interpSeq.length; i++){
+						document.getElementById(this.outputDiv).innerHTML += this.interpSeq[i].values + "<br>";
+					}
+				}	
+			}
+			
+			let postHandler = class {
+				/*
+					Toast handler?
+					No, post handler.  It handles the post.
+					So what's it do?
+					You can give it a post object, and it adds it to the rest of them.
+					That it?
+					Nope, it can also read a server directory for JSON files.\
+					Write, too?
+					Yeah, that was the first thing.
+					Toast handling.
+					Like blast processing?
+					Yeah.  But what else can this thing besides server read/write.
+					There is a post populator, once the JSON is parsed to objects.
+					Does it just load all the files in the directory at once?
+					No, just four at a time.
+					When does it add another 4?
+					Whenever the screen scrolls to the bottom of the main Area div.
+					Okay, let's start making functions.
+					
+					//VARIABLES
+					this.postData = [{},{},{},{}];
+						the next 4 posts to load.  so it goes,
+							read from dir, write next 4 to this.postData, post this.postData.
+				*/
+				constructor(){
+					this.postData = null; //the 4 posts to write.
+					
+				}
+				
+				readNextFour(){
+					//read next 4 posts from dir,
+					//write to this.postData.
+					/*
+						challenge:
+							how do you tell which is next?
+							you must load the post by id.
+							so there has to be a way to 
+							getPostById.
+								
+					*/
+				}
+				
+				
+				
+				post(){
+					
+				}
+			}
+			
+			//RUNTIME
+			var x = new charDiv(0,512,"outputDiv");
+			var mnop = new charDivArray((64 * 4),(128 * 128),"outputArea","proceduralDiv",(1024));
+			var qrst = new charDivArray(1999,2999 ,"outputArea","otherProceduralDiv",(1024));
+			var qrst2 = new charDivArray(5899,9999,"outputArea","otherOtherProceduralDiv",(1024));
+			var qrst3 = new charDivArray(11899,14999,"outputArea","otherOtherOtherOtherProceduralDiv",(1024));
+			var uvwx = new shimmerBoy(mnop);
+			var yzab = new shimmerBoy(qrst);
+			var qrst2D = new shimmerBoy(qrst2);
+			var qrst3D = new shimmerBoy(qrst3);
+			uvwx.activate();
+			yzab.activate();
+			qrst2D.activate();
+			qrst3D.activate();
+
+			let aox = new theRealFiboGrad(new rgbaBoy(), new rgbaBoy(), 7, 500, "horny on main", "fiboDivsArea");
+			let bmt = new siteBuilder(aox);
+			bmt.makeMainArea();
+			
+			//TEST POSTS.
+			//postID, postTitle, type, postDescription, imageURL, audioURL
+			let e82518_1 = new post("post82518","Atmosphere Seven","song","From the Ithaca Beach set, 2023","IMG/3.gif","WAV/9.mp3");
+			e82518_1.placePost("mainArea");
+			
+			let eni = new post("a1","testPost","song","whats it gonna be, song or no song?","IMG/2.jpg","WAV/8.mp3");
+			//let ani = new post("a2","testPost2","dance","it is good to dance","IMG/3.jpg","WAV/8.mp3");
+			//eni.placePost("mainArea");
+			//ani.placePost("mainArea");
+			
+			//REAL POSTS.
+		</script>
+	</body>
+</html>
